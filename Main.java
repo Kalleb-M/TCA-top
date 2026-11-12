@@ -5,7 +5,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
-public class Bahhhh {
+public class Main {
 
     //Lê valores inteiros
     public static int Read(){
