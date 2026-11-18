@@ -689,8 +689,6 @@ public class Main {
 
             int perdedor = Rodada(matriz, inicio);
             PerderDado(matriz, perdedor);
-            TocarSom("sons/morte.wav");
-
             if (JogadorAtivo(matriz, perdedor)) {
                 inicio = perdedor;
             }
@@ -707,7 +705,6 @@ public class Main {
         }
 
         Vencedor(matriz);
-        TocarSom("sons/vitoria.wav");
 
         System.out.println();
         System.out.println("Aperte Enter para voltar ao menu.");
@@ -715,7 +712,6 @@ public class Main {
         READ.nextLine();
         READ.nextLine();
 
-        PararSom();
     }
 
     public static Scanner READ = new Scanner(System.in);
