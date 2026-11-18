@@ -543,40 +543,6 @@ public class Main {
         "|_____/_/    \\_\\_____/_____|_| \\_|_|  |_|\\____/ ",
     };
 
-    public static Clip somAtual;
-
-    //=====================================================================================================================
-    //Toca um arquivo de som .wav; se o arquivo não existir ou não houver saída de som, o jogo continua sem som
-    //=====================================================================================================================
-
-    public static void TocarSom(String arquivo) {
-
-        PararSom();
-
-        try {
-            AudioInputStream audio = AudioSystem.getAudioInputStream(new File(arquivo));
-            somAtual = AudioSystem.getClip();
-            somAtual.open(audio);
-            somAtual.start();
-        }
-        catch (Exception e) {
-            somAtual = null;
-        }
-    }
-
-    //=====================================================================================================================
-    //Para o som que estiver tocando
-    //=====================================================================================================================
-
-    public static void PararSom() {
-
-        if (somAtual != null) {
-            somAtual.stop();
-            somAtual.close();
-            somAtual = null;
-        }
-    }
-
     //=====================================================================================================================
     //Empurra o conteúdo da tela para cima com linhas em branco
     //=====================================================================================================================
