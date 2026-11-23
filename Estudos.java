@@ -8,17 +8,16 @@ public class Bahhhh {
 
 
     //=====================================================================================================================
-    //Toca um efeito sonoro e, se pedido, espera ele terminar
+    //Toca um som
     //=====================================================================================================================
-
-    public static void tocarSom(String caminhoArquivoSom, boolean esperarTerminar){
+    public static Clip tocarSom(String caminhoArquivoSom, boolean esperarTerminar){
 
         try {
             // Abrindo o arquivo de som
             File soundFile = new File(caminhoArquivoSom);
             if (!soundFile.exists()) {
                 System.out.println("Arquivo de som não encontrado: " + caminhoArquivoSom);
-                return;
+                return null;
             }
 
             // Criando um AudioInputStream
@@ -35,9 +34,10 @@ public class Bahhhh {
             // O áudio já foi carregado no Clip, então o arquivo pode ser fechado
             audioStream.close();
 
-            // Quando o som terminar, libera os recursos automaticamente
+            // Quando o som chegar ao fim, libera os recursos automaticamente
+            // (se ele só foi pausado no meio, continua aberto para poder voltar a tocar)
             audioClip.addLineListener(evento -> {
-                if (evento.getType() == LineEvent.Type.STOP) {
+                if (evento.getType() == LineEvent.Type.STOP && audioClip.getFramePosition() >= audioClip.getFrameLength()) {
                     audioClip.close();
                 }
             });
@@ -49,6 +49,10 @@ public class Bahhhh {
             if (esperarTerminar) {
                 Thread.sleep(audioClip.getMicrosecondLength() / 1000);
             }
+
+            // Devolvendo o som
+            return audioClip;
+
         // Avisando qual foi o problema, se algo der errado
         } catch (UnsupportedAudioFileException e) {
             System.err.println("O formato de áudio não é suportado.");
@@ -62,65 +66,52 @@ public class Bahhhh {
         } catch (InterruptedException e) {
             System.err.println("O programa foi interrompido.");
             e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            System.err.println("Nenhuma saída de som disponível para este áudio.");
         }
+
+        // Se deu algum problema, não tem som para devolver
+        return null;
     }
 
     //Lê valores inteiros
     public static int Read(){
-        // Lendo o próximo número digitado
         int value = READ.nextInt();
         return value;
     }
 
-    // Guardando a música de fundo, para poder pausar, continuar e parar
+    // Guarda a música de fundo
     public static Clip somFundo;
 
     //=====================================================================================================================
-    //Toca uma música de fundo em loop e em volume baixo, por baixo dos outros sons
+    //Deixa a música de fundo em volume baixo e em loop
     //=====================================================================================================================
-
     public static void TocarFundo(String caminhoArquivoSom) {
 
-        // Volume da música de fundo em decibéis (mais perto de 0 = mais alto)
+        // Volume da música de fundo em decibéis
         float volumeFundo = -20.0f;
 
-        try {
-            // Abrindo o arquivo de som
-            File soundFile = new File(caminhoArquivoSom);
-            if (!soundFile.exists()) {
-                System.out.println("Arquivo de som não encontrado: " + caminhoArquivoSom);
-                return;
-            }
+        // Toca a música
+        somFundo = tocarSom(caminhoArquivoSom, false);
 
-            // Criando um AudioInputStream
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
-
-            // Criando o Clip e carregando o áudio
-            somFundo = AudioSystem.getClip();
-            somFundo.open(audioStream);
-
-            // O áudio já foi carregado no Clip, então o arquivo pode ser fechado
-            audioStream.close();
-
-            // Abaixando o volume, sem passar do mínimo e do máximo que o computador aceita
-            if (somFundo.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-                FloatControl volume = (FloatControl) somFundo.getControl(FloatControl.Type.MASTER_GAIN);
-                volume.setValue(Math.max(volume.getMinimum(), Math.min(volumeFundo, volume.getMaximum())));
-            }
-
-            // Tocando a música em loop, sem parar
-            somFundo.loop(Clip.LOOP_CONTINUOUSLY);
+        // Se não deu para tocar, o jogo continua sem a música
+        if (somFundo == null) {
+            return;
         }
-        // Se não der para tocar, o jogo continua sem a música
-        catch (Exception e) {
-            System.err.println("Não foi possível tocar a música de fundo.");
+
+        // Abaixa o volume, sem passar do mínimo e do máximo que o computador aceita
+        if (somFundo.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+            FloatControl volume = (FloatControl) somFundo.getControl(FloatControl.Type.MASTER_GAIN);
+            volume.setValue(Math.max(volume.getMinimum(), Math.min(volumeFundo, volume.getMaximum())));
         }
+
+        // Colocando a música em loop
+        somFundo.loop(Clip.LOOP_CONTINUOUSLY);
     }
 
     //=====================================================================================================================
     //Pausa a música de fundo, guardando o ponto em que ela parou
     //=====================================================================================================================
-
     public static void PausarFundo() {
 
         // Só pausa se a música estiver carregada
@@ -133,7 +124,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Continua a música de fundo do ponto em que ela foi pausada
     //=====================================================================================================================
-
     public static void ContinuarFundo() {
 
         // Só continua se a música estiver carregada
@@ -146,28 +136,20 @@ public class Bahhhh {
     //=====================================================================================================================
     //Para a música de fundo de vez
     //=====================================================================================================================
-
     public static void PararFundo() {
 
         // Só para se a música estiver carregada
         if (somFundo != null) {
-            // Parando a música e liberando o arquivo
+            // Para a música e libera o arquivo
             somFundo.stop();
             somFundo.close();
 
-            // Marcando que não tem mais música carregada
+            // Marca que não tem mais música carregada
             somFundo = null;
         }
     }
 
-    //Lê valores "char"
-    public static char ReadC(){
-        // Lendo a próxima palavra digitada e pegando só a primeira letra
-        char value = READ.next().charAt(0);
-        return value;
-    }
-
-    // Desenhos dos dados de 1 a 6: ASCIIDados[valor - 1] guarda as linhas do dado com aquele valor
+    // Desenhos dos dados
     public static String[][] ASCIIDados = {
         {
             "    +-----------+",
@@ -240,7 +222,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Recebe a quantidade de jogadores
     //=====================================================================================================================
-
     public static int QuantidadeJog() {
         // Lendo quantos jogadores vão jogar
         int quantPlayers = Read();
@@ -250,7 +231,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Define o valor dos dados
     //=====================================================================================================================
-
     public static int[][] Dados(int[][] quantDados, int quantPlayers) {
 
         // Criando o sorteador dos dados
@@ -285,12 +265,11 @@ public class Bahhhh {
     }
 
     //=====================================================================================================================
-    //Imprime os dados de um jogador lado a lado em ASCII art
+    //Imprime os dados de um jogador em ASCII art
     //=====================================================================================================================
-
     public static void ImprimirDados(int[] dadosJogador) {
 
-        // Uma cor para cada dado: o primeiro vermelho, o segundo amarelo e o terceiro verde
+        // Uma cor para cada dado
         String[] cores = {VERMELHO, AMARELO, VERDE};
 
         // Imprimindo a linha 1 de todos os dados, depois a linha 2 de todos, e assim por diante (deixa os dados lado a lado)
@@ -307,7 +286,7 @@ public class Bahhhh {
     }
 
     //=====================================================================================================================
-    //Mostra para o jogador da vez: os próprios dados, os dados na mesa e a última tentativa
+    //Mostra os próprios dados, os dados na mesa e a última tentativa
     //=====================================================================================================================
 
     public static void MostrarVez(int[][] quantDados, int jogador, int naMesa, int[] ultmTent) {
@@ -335,24 +314,24 @@ public class Bahhhh {
     }
 
     //=====================================================================================================================
-    //Verifica se a jogada está correta
+    //Verifica se a jogada é válida
     //=====================================================================================================================
 
     public static char[] JogadaCouE(char[] tent, int naMesa, int[] ultmTent){
 
-        // Criando o vetor da tentativa e marcando que ainda não houve jogada válida
+        // Cria o vetor da tentativa
         tent = new char[3];
         boolean x = false;
 
-            // Repetindo até o jogador fazer uma jogada válida
+            // Repetr até o jogador fazer uma jogada válida
             while (true) {
 
-                // Jogada válida: devolve a tentativa
+                // Jogada válida = devolve a tentativa
                 if (x == true) {
                     return tent;
                 }
 
-                // Lendo a tentativa do jogador
+                // Lê a tentativa do jogador
                 tent = Mediador();
 
                 // Duvidar só vale se já existir uma tentativa na rodada
@@ -361,39 +340,39 @@ public class Bahhhh {
                         x = true;
                     }
                 }
-                // Conferindo se a quantidade e a face são números
+                // Confere se a quantidade e a face são números
                 else if (Character.isDigit(tent[0]) && Character.isDigit(tent[1]) && Character.isDigit(tent[2])) {
 
-                    // Transformando os char em números (tent[0] é a dezena e tent[1] é a unidade da quantidade)
+                    // Transforma os char em números
                     int quant = Character.getNumericValue(tent[0]) * 10 + Character.getNumericValue(tent[1]);
                     int face = Character.getNumericValue(tent[2]);
 
                     // A quantidade não pode passar dos dados na mesa, e a face vai de 1 a 6
                     if (quant >= 1 && quant <= naMesa && face >= 1 && face <= 6) {
 
-                        // Primeira tentativa da rodada: qualquer uma vale
+                        // Primeira tentativa da rodada
                         if (ultmTent[0] == 0) {
                             x = true;
                         }
-                        // Normal para normal: quantidade maior, ou mesma quantidade com face maior
+                        // Valida a tentativa (núm sem coringa para núm não coringa)
                         else if (ultmTent[1] != 1 && face != 1) {
                             if ((quant > ultmTent[0]) || (quant == ultmTent[0] && face > ultmTent[1])) {
                                 x = true;
                             }
                         }
-                        // Normal para coringa: pelo menos a metade, arredondada para baixo
+                        // Valida a tentativa (núm não coringa para coringa)
                         else if (ultmTent[1] != 1 && face == 1) {
                             if (quant >= ultmTent[0] / 2) {
                                 x = true;
                             }
                         }
-                        // Coringa para coringa: quantidade maior
+                        // Valida a tentativa (coringa para coringa)
                         else if (ultmTent[1] == 1 && face == 1) {
                             if (quant > ultmTent[0]) {
                                 x = true;
                             }
                         }
-                        // Coringa para normal: pelo menos o dobro + 1
+                        // Valida a tentativa (coringa para núm não coringa)
                         else if (ultmTent[1] == 1 && face != 1) {
                             if (quant >= ultmTent[0] * 2 + 1) {
                                 x = true;
@@ -401,14 +380,14 @@ public class Bahhhh {
                         }
                     }
 
-                    // Guardando a tentativa, se ela for válida
+                    // Guarda a tentativa se ela for válida
                     if (x == true) {
                         ultmTent[0] = quant;
                         ultmTent[1] = face;
                     }
                 }
 
-                // Avisando quando a jogada não vale
+                // Avisa quando a jogada não vale
                 if (x == false) {
                     System.out.println("Jogada inválida, tente novamente.");
                 }
@@ -418,20 +397,18 @@ public class Bahhhh {
     //=====================================================================================================================
     //Soma a quantidade de dados e verifica a tentativa
     //=====================================================================================================================
-
     public static boolean Duvidar(int[][] dados, int[] ultmTent) {
 
-        // Pegando a última tentativa, que é a que está sendo duvidada
+        // Pega a última tentativa, que é a que está sendo duvidada
         int quant = ultmTent[0];
         int face = ultmTent[1];
 
-        // Contador de cada face: value[0] guarda os 1, value[1] os 2, e assim por diante
+        // Contador de cada face
         int[] value = {0, 0, 0, 0, 0, 0};
 
-        // Começa considerando a tentativa errada
         boolean resp = false;
 
-        // Contando quantos dados de cada face existem na mesa (os 0 são ignorados)
+        // Contando quantos dados de cada face existem na mesa
         for(int linhas = 0; linhas < dados.length; linhas++) {
             for(int colunas = 0; colunas < dados[linhas].length; colunas++) {
 
@@ -460,7 +437,7 @@ public class Bahhhh {
         }
 
         // A tentativa está certa se houver pelo menos a quantidade apostada
-        // Coringa conta só os 1; as outras faces somam os 1 junto (value[0])
+        // Coringa conta só os 1 e as outras faces somam os 1 junto
         switch (face) {
             case 1:
             if (quant <= value[0]) {
@@ -549,7 +526,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Esconde os dados do jogador anterior e espera o próximo jogador assumir o terminal
     //=====================================================================================================================
-
     public static void LimparTela(int jogador) {
 
         // Esperando o jogador anterior apertar Enter
@@ -571,7 +547,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Revela os dados de todos os jogadores que ainda estão no jogo
     //=====================================================================================================================
-
     public static void MostrarTodos(int[][] quantDados) {
 
         System.out.println("===== Dados revelados =====");
@@ -586,9 +561,8 @@ public class Bahhhh {
     }
 
     //=====================================================================================================================
-    //Retira um dado do jogador, transformando o primeiro valor diferente de 0 da linha dele em 0
+    //Retira um dado do jogador
     //=====================================================================================================================
-
     public static void PerderDado(int[][] quantDados, int jogador) {
 
         // Procurando o primeiro dado que o jogador ainda tem
@@ -605,7 +579,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Verifica se o jogador ainda tem pelo menos um dado
     //=====================================================================================================================
-
     public static boolean JogadorAtivo(int[][] quantDados, int jogador) {
 
         // Se achar algum dado diferente de 0, o jogador ainda está no jogo
@@ -622,7 +595,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Conta quantos jogadores ainda têm dados
     //=====================================================================================================================
-
     public static int QuantidadeAtivos(int[][] quantDados) {
 
         // Contando os jogadores que ainda têm pelo menos um dado
@@ -638,7 +610,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Retorna o próximo jogador que ainda tem dados, voltando ao primeiro depois do último
     //=====================================================================================================================
-
     public static int ProximoJogador(int[][] quantDados, int atual) {
 
         // Passando para o próximo jogador; o % volta para o primeiro depois do último
@@ -654,7 +625,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Joga uma rodada inteira, do primeiro palpite até alguém duvidar, e retorna o jogador que perde o dado
     //=====================================================================================================================
-
     public static int Rodada(int[][] quantDados, int inicio) {
 
         // Criando a última tentativa da rodada: [0] = quantidade, [1] = face (0 = ninguém apostou ainda)
@@ -711,7 +681,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Mostra quantos dados cada jogador ainda tem
     //=====================================================================================================================
-
     public static void Placar(int[][] quantDados) {
 
         System.out.println("===== Placar =====");
@@ -731,7 +700,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Anuncia o único jogador que ainda tem dados
     //=====================================================================================================================
-
     public static void Vencedor(int[][] quantDados) {
 
         // Procurando o único jogador que ainda tem dados
@@ -764,7 +732,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Empurra o conteúdo da tela para cima com linhas em branco
     //=====================================================================================================================
-
     public static void PularLinhas() {
 
         // Imprimindo 50 linhas em branco
@@ -776,7 +743,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Desenha uma opção do menu
     //=====================================================================================================================
-
     public static void Opcao(char numero, String nome) {
 
         // Centralizando o nome dentro de um retângulo de 17 espaços
@@ -795,7 +761,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Mostra o menu inicial e executa a opção escolhida
     //=====================================================================================================================
-
     public static void Menu() {
 
         // Mostrando o menu de novo sempre que uma partida ou o tutorial terminar
@@ -847,7 +812,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Explica as regras e os comandos do jogo
     //=====================================================================================================================
-
     public static void Tutorial() {
 
         PularLinhas();
@@ -901,7 +865,6 @@ public class Bahhhh {
     //=====================================================================================================================
     //Roda uma partida
     //=====================================================================================================================
-
     public static void Jogar() {
 
         // Recomeçando a música de fundo do início a cada partida
@@ -970,12 +933,7 @@ public class Bahhhh {
 
     // Leitor do teclado usado no jogo inteiro
     public static Scanner READ = new Scanner(System.in);
-
-    //=====================================================================================================================
-    //Começa o programa: liga a música de fundo e abre o menu
-    //=====================================================================================================================
-
-    public static void main(String[] args) {
+       public static void main(String[] args) {
 
         // Ligando a música de fundo
         TocarFundo("fundo.wav");
