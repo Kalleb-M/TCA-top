@@ -1,23 +1,132 @@
 import java.util.Scanner;
 import java.util.Random;
+import javax.sound.sampled.*;
+import java.io.File;
+import java.io.IOException;
 
-public class Main {
+public class Bahhhh {
 
-    //Lê valores inteiros
+
+    //=====================================================================================================================
+    //Toca um som
+    //=====================================================================================================================
+    public static Clip tocarSom(String caminhoArquivoSom, boolean esperarTerminar){
+
+        try {
+            File soundFile = new File(caminhoArquivoSom);
+            if (!soundFile.exists()) {
+                System.out.println("Arquivo de som não encontrado: " + caminhoArquivoSom);
+                return null;
+            }
+
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
+
+            AudioFormat format = audioStream.getFormat();
+            DataLine.Info info = new DataLine.Info(Clip.class, format);
+
+            Clip audioClip = (Clip) AudioSystem.getLine(info);
+            audioClip.open(audioStream);
+
+            audioStream.close();
+
+            audioClip.addLineListener(evento -> {
+                if (evento.getType() == LineEvent.Type.STOP && audioClip.getFramePosition() >= audioClip.getFrameLength()) {
+                    audioClip.close();
+                }
+            });
+
+            audioClip.start();
+
+            if (esperarTerminar) {
+                Thread.sleep(audioClip.getMicrosecondLength() / 1000);
+            }
+
+            return audioClip;
+
+        } catch (UnsupportedAudioFileException e) {
+            System.err.println("O formato de áudio não é suportado.");
+            e.printStackTrace();
+        } catch (LineUnavailableException e) {
+            System.err.println("Linha de áudio não disponível.");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Erro ao ler o arquivo de áudio.");
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            System.err.println("O programa foi interrompido.");
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            System.err.println("Nenhuma saída de som disponível para este áudio.");
+        }
+
+        return null;
+    }
+
     public static int Read(){
         int value = READ.nextInt();
         return value;
     }
 
-    //Lê valores "char"
     public static char ReadC(){
         char value = READ.next().charAt(0);
         return value;
     }
 
-    public static int[] ultmTent = new int[2];
+    public static Clip somFundo;
 
-    public static int naMesa = 0;
+    //=====================================================================================================================
+    //Deixa a música de fundo em volume baixo e em loop
+    //=====================================================================================================================
+    public static void TocarFundo(String caminhoArquivoSom) {
+
+        float volumeFundo = -20.0f;
+
+        somFundo = tocarSom(caminhoArquivoSom, false);
+
+        if (somFundo == null) {
+            return;
+        }
+
+        if (somFundo.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+            FloatControl volume = (FloatControl) somFundo.getControl(FloatControl.Type.MASTER_GAIN);
+            volume.setValue(Math.max(volume.getMinimum(), Math.min(volumeFundo, volume.getMaximum())));
+        }
+
+        somFundo.loop(Clip.LOOP_CONTINUOUSLY);
+    }
+
+    //=====================================================================================================================
+    //Pausa a música de fundo, guardando o ponto em que ela parou
+    //=====================================================================================================================
+    public static void PausarFundo() {
+
+        if (somFundo != null) {
+            somFundo.stop();
+        }
+    }
+
+    //=====================================================================================================================
+    //Continua a música de fundo do ponto em que ela foi pausada
+    //=====================================================================================================================
+    public static void ContinuarFundo() {
+
+        if (somFundo != null) {
+            somFundo.loop(Clip.LOOP_CONTINUOUSLY);
+        }
+    }
+
+    //=====================================================================================================================
+    //Para a música de fundo de vez
+    //=====================================================================================================================
+    public static void PararFundo() {
+
+        if (somFundo != null) {
+            somFundo.stop();
+            somFundo.close();
+
+            somFundo = null;
+        }
+    }
 
     public static String[][] ASCIIDados = {
         {
@@ -91,7 +200,6 @@ public class Main {
     //=====================================================================================================================
     //Recebe a quantidade de jogadores
     //=====================================================================================================================
-
     public static int QuantidadeJog() {
         int quantPlayers = Read();
         return quantPlayers;
@@ -100,7 +208,6 @@ public class Main {
     //=====================================================================================================================
     //Define o valor dos dados
     //=====================================================================================================================
-
     public static int[][] Dados(int[][] quantDados, int quantPlayers) {
 
         Random dados = new Random();
@@ -114,6 +221,7 @@ public class Main {
                 }
             }
         }
+
         for (int linhas = 0; linhas < quantDados.length; linhas++) {
             for (int colunas = 0; colunas < quantDados[linhas].length; colunas++) {
 
@@ -129,15 +237,15 @@ public class Main {
     }
 
     //=====================================================================================================================
-    //Imprime os dados de um jogador lado a lado em ASCII art
+    //Imprime os dados de um jogador em ASCII art
     //=====================================================================================================================
-
     public static void ImprimirDados(int[] dadosJogador) {
 
         String[] cores = {VERMELHO, AMARELO, VERDE};
 
         for (int linha = 0; linha < ASCIIDados[0].length; linha++) {
             for (int colunas = 0; colunas < dadosJogador.length; colunas++) {
+
                 if (dadosJogador[colunas] != 0) {
                     System.out.print(cores[colunas] + ASCIIDados[dadosJogador[colunas] - 1][linha] + RESET + "   ");
                 }
@@ -147,19 +255,10 @@ public class Main {
     }
 
     //=====================================================================================================================
-    //Mostra para o jogador da vez: os próprios dados, os dados na mesa e a última tentativa
+    //Mostra os próprios dados, os dados na mesa e a última tentativa
     //=====================================================================================================================
 
-    public static void MostrarVez(int[][] quantDados, int jogador) {
-
-        naMesa = 0;
-        for (int linhas = 0; linhas < quantDados.length; linhas++) {
-            for (int colunas = 0; colunas < quantDados[linhas].length; colunas++) {
-                if (quantDados[linhas][colunas] != 0) {
-                    naMesa++;
-                }
-            }
-        }
+    public static void MostrarVez(int[][] quantDados, int jogador, int naMesa, int[] ultmTent) {
 
         System.out.println("===== Vez do Jogador " + (jogador + 1) + " =====");
 
@@ -180,10 +279,10 @@ public class Main {
     }
 
     //=====================================================================================================================
-    //Verifica se a jogada está correta
+    //Verifica se a jogada é válida
     //=====================================================================================================================
 
-    public static char[] JogadaCouE(char[] tent){
+    public static char[] JogadaCouE(char[] tent, int naMesa, int[] ultmTent){
 
         tent = new char[3];
         boolean x = false;
@@ -248,8 +347,7 @@ public class Main {
     //=====================================================================================================================
     //Soma a quantidade de dados e verifica a tentativa
     //=====================================================================================================================
-
-    public static boolean Duvidar(int[][] dados) {
+    public static boolean Duvidar(int[][] dados, int[] ultmTent) {
 
         int quant = ultmTent[0];
         int face = ultmTent[1];
@@ -363,15 +461,15 @@ public class Main {
     //=====================================================================================================================
     //Esconde os dados do jogador anterior e espera o próximo jogador assumir o terminal
     //=====================================================================================================================
-
     public static void LimparTela(int jogador) {
 
         System.out.println("Aperte Enter para esconder a tela.");
         READ.nextLine();
         READ.nextLine();
 
-        System.out.print("\033[H\033[2J\033[3J");
-        System.out.flush();
+        for (int i = 0; i < 50; i++) {
+            System.out.println();
+        }
 
         System.out.println("Passe para o Jogador " + (jogador + 1) + " e aperte Enter.");
         READ.nextLine();
@@ -380,7 +478,6 @@ public class Main {
     //=====================================================================================================================
     //Revela os dados de todos os jogadores que ainda estão no jogo
     //=====================================================================================================================
-
     public static void MostrarTodos(int[][] quantDados) {
 
         System.out.println("===== Dados revelados =====");
@@ -394,13 +491,13 @@ public class Main {
     }
 
     //=====================================================================================================================
-    //Retira um dado do jogador, transformando o primeiro valor diferente de 0 da linha dele em 0
+    //Retira um dado do jogador
     //=====================================================================================================================
-
     public static void PerderDado(int[][] quantDados, int jogador) {
 
         for (int colunas = 0; colunas < quantDados[jogador].length; colunas++) {
             if (quantDados[jogador][colunas] != 0) {
+
                 quantDados[jogador][colunas] = 0;
                 return;
             }
@@ -408,9 +505,8 @@ public class Main {
     }
 
     //=====================================================================================================================
-    //Verifica se o jogador ainda tem pelo menos um dado (linha não está toda zerada)
+    //Verifica se o jogador ainda tem pelo menos um dado
     //=====================================================================================================================
-
     public static boolean JogadorAtivo(int[][] quantDados, int jogador) {
 
         for (int colunas = 0; colunas < quantDados[jogador].length; colunas++) {
@@ -418,13 +514,13 @@ public class Main {
                 return true;
             }
         }
+
         return false;
     }
 
     //=====================================================================================================================
     //Conta quantos jogadores ainda têm dados
     //=====================================================================================================================
-
     public static int QuantidadeAtivos(int[][] quantDados) {
 
         int ativos = 0;
@@ -439,7 +535,6 @@ public class Main {
     //=====================================================================================================================
     //Retorna o próximo jogador que ainda tem dados, voltando ao primeiro depois do último
     //=====================================================================================================================
-
     public static int ProximoJogador(int[][] quantDados, int atual) {
 
         int proximo = atual;
@@ -453,11 +548,18 @@ public class Main {
     //=====================================================================================================================
     //Joga uma rodada inteira, do primeiro palpite até alguém duvidar, e retorna o jogador que perde o dado
     //=====================================================================================================================
-
     public static int Rodada(int[][] quantDados, int inicio) {
 
-        ultmTent[0] = 0;
-        ultmTent[1] = 0;
+        int[] ultmTent = new int[2];
+
+        int naMesa = 0;
+        for (int linhas = 0; linhas < quantDados.length; linhas++) {
+            for (int colunas = 0; colunas < quantDados[linhas].length; colunas++) {
+                if (quantDados[linhas][colunas] != 0) {
+                    naMesa++;
+                }
+            }
+        }
 
         int atual = inicio;
         int ultimoApostou = -1;
@@ -465,9 +567,9 @@ public class Main {
         while (true) {
 
             LimparTela(atual);
-            MostrarVez(quantDados, atual);
+            MostrarVez(quantDados, atual, naMesa, ultmTent);
 
-            char[] tent = JogadaCouE(null);
+            char[] tent = JogadaCouE(null, naMesa, ultmTent);
 
             if (tent[0] == 'D') {
 
@@ -475,7 +577,7 @@ public class Main {
                 System.out.println("Jogador " + (atual + 1) + " duvidou do Jogador " + (ultimoApostou + 1) + "!");
                 MostrarTodos(quantDados);
 
-                if (Duvidar(quantDados)) {
+                if (Duvidar(quantDados, ultmTent)) {
                     System.out.println("A tentativa estava certa! Jogador " + (atual + 1) + " perde um dado.");
                     return atual;
                 }
@@ -493,7 +595,6 @@ public class Main {
     //=====================================================================================================================
     //Mostra quantos dados cada jogador ainda tem
     //=====================================================================================================================
-
     public static void Placar(int[][] quantDados) {
 
         System.out.println("===== Placar =====");
@@ -512,7 +613,6 @@ public class Main {
     //=====================================================================================================================
     //Anuncia o único jogador que ainda tem dados
     //=====================================================================================================================
-
     public static void Vencedor(int[][] quantDados) {
 
         for (int linhas = 0; linhas < quantDados.length; linhas++) {
@@ -538,10 +638,10 @@ public class Main {
         "|_____/_/    \\_\\_____/_____|_| \\_|_|  |_|\\____/ ",
     };
 
+
     //=====================================================================================================================
     //Empurra o conteúdo da tela para cima com linhas em branco
     //=====================================================================================================================
-
     public static void PularLinhas() {
 
         for (int i = 0; i < 50; i++) {
@@ -550,9 +650,8 @@ public class Main {
     }
 
     //=====================================================================================================================
-    //Desenha uma opção do menu: um quadrado com o número e, ao lado, um retângulo com o nome da opção
+    //Desenha uma opção do menu
     //=====================================================================================================================
-
     public static void Opcao(char numero, String nome) {
 
         int largura = 17;
@@ -567,9 +666,8 @@ public class Main {
     }
 
     //=====================================================================================================================
-    //Mostra o menu inicial e executa a opção escolhida (1 = jogar, 2 = tutorial, 3 = sair)
+    //Mostra o menu inicial e executa a opção escolhida
     //=====================================================================================================================
-
     public static void Menu() {
 
         while (true) {
@@ -613,7 +711,6 @@ public class Main {
     //=====================================================================================================================
     //Explica as regras e os comandos do jogo
     //=====================================================================================================================
-
     public static void Tutorial() {
 
         PularLinhas();
@@ -662,16 +759,18 @@ public class Main {
     }
 
     //=====================================================================================================================
-    //Joga uma partida inteira, da escolha da quantidade de jogadores até o vencedor
+    //Roda uma partida
     //=====================================================================================================================
-
     public static void Jogar() {
 
-        System.out.println("Insira a quantidade de jogadores (2 a 6).");
+        PararFundo();
+        TocarFundo("fundo.wav");
+
+        System.out.println("Insira a quantidade de jogadores");
         int quantJog = QuantidadeJog();
 
         while (quantJog < 2 || quantJog > 6) {
-            System.out.println("Quantidade inválida. Insira de 2 a 6 jogadores.");
+            System.out.println("Quantidade inválida, insira de 2 a 6 jogadores");
             quantJog = QuantidadeJog();
         }
 
@@ -684,6 +783,11 @@ public class Main {
 
             int perdedor = Rodada(matriz, inicio);
             PerderDado(matriz, perdedor);
+
+            PausarFundo();
+            tocarSom("morte.wav", true);
+            ContinuarFundo();
+
             if (JogadorAtivo(matriz, perdedor)) {
                 inicio = perdedor;
             }
@@ -700,17 +804,20 @@ public class Main {
         }
 
         Vencedor(matriz);
+        PararFundo();
+        tocarSom("vitoria.wav", true);
 
         System.out.println();
         System.out.println("Aperte Enter para voltar ao menu.");
 
         READ.nextLine();
         READ.nextLine();
-
     }
 
     public static Scanner READ = new Scanner(System.in);
-    public static void main(String[] args) {
+       public static void main(String[] args) {
+
+        TocarFundo("fundo.wav");
 
         Menu();
     }
