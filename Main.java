@@ -1,826 +1,130 @@
-import java.util.Scanner;
 import java.util.Random;
-import javax.sound.sampled.*;
-import java.io.File;
-import java.io.IOException;
+import java.util.Scanner;
+import java.lang.Thread;
 
-public class LucasKalebTCA {
+public class animacao {
+    static Random r = new Random();
+    public static void animacaoCarregamento(){
+
+        for (int i = 0; i < 100; i++) {
+
+            limparTela();
+            pularLinhas();
+
+            System.out.println(AMARELO + "Preparando a partida..." + RESET);
+            System.out.println("Carregando " + (i + 1) + "%");
 
 
-    //=====================================================================================================================
-    //Toca um som
-    //=====================================================================================================================
-    public static Clip tocarSom(String caminhoArquivoSom, boolean esperarTerminar){
+            int numero = r.nextInt(6);
 
-        try {
-            File soundFile = new File(caminhoArquivoSom);
-            if (!soundFile.exists()) {
-                System.out.println("Arquivo de som não encontrado: " + caminhoArquivoSom);
-                return null;
+            switch (numero) {
+                case 0:
+                    System.out.println(VERMELHO + DADO_1 + RESET);
+                    break;
+
+                case 1:
+                    System.out.println(AMARELO + DADO_2 + RESET);
+                    break;
+
+                case 2:
+                    System.out.println(ROXO + DADO_3 + RESET);
+                    break;
+
+                case 3:
+                    System.out.println(VERDE + DADO_4 + RESET);
+                    break;
+
+                case 4:
+                    System.out.println(VERMELHO + DADO_5 + RESET);
+                    break;
+
+                case 5:
+                    System.out.println(AMARELO + DADO_6 + RESET);
+                    break;
             }
 
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
-
-            AudioFormat format = audioStream.getFormat();
-            DataLine.Info info = new DataLine.Info(Clip.class, format);
-
-            Clip audioClip = (Clip) AudioSystem.getLine(info);
-            audioClip.open(audioStream);
-
-            audioStream.close();
-
-            audioClip.addLineListener(evento -> {
-                if (evento.getType() == LineEvent.Type.STOP && audioClip.getFramePosition() >= audioClip.getFrameLength()) {
-                    audioClip.close();
-                }
-            });
-
-            audioClip.start();
-
-            if (esperarTerminar) {
-                Thread.sleep(audioClip.getMicrosecondLength() / 1000);
-            }
-
-            return audioClip;
-
-        } catch (UnsupportedAudioFileException e) {
-            System.err.println("O formato de áudio não é suportado.");
-            e.printStackTrace();
-        } catch (LineUnavailableException e) {
-            System.err.println("Linha de áudio não disponível.");
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.err.println("Erro ao ler o arquivo de áudio.");
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            System.err.println("O programa foi interrompido.");
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            System.err.println("Nenhuma saída de som disponível para este áudio.");
-        }
-
-        return null;
-    }
-
-    public static int read(){
-        int value = READ.nextInt();
-        return value;
-    }
-
-    public static char readC(){
-        char value = READ.next().charAt(0);
-        return value;
-    }
-
-    public static Clip somFundo;
-
-    //=====================================================================================================================
-    //Deixa a música de fundo em volume baixo e em loop
-    //=====================================================================================================================
-    public static void tocarFundo(String caminhoArquivoSom) {
-
-        float volumeFundo = -20.0f;
-
-        somFundo = tocarSom(caminhoArquivoSom, false);
-
-        if (somFundo == null) {
-            return;
-        }
-
-        if (somFundo.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-            FloatControl volume = (FloatControl) somFundo.getControl(FloatControl.Type.MASTER_GAIN);
-            volume.setValue(Math.max(volume.getMinimum(), Math.min(volumeFundo, volume.getMaximum())));
-        }
-
-        somFundo.loop(Clip.LOOP_CONTINUOUSLY);
-    }
-
-    //=====================================================================================================================
-    //Pausa a música de fundo, guardando o ponto em que ela parou
-    //=====================================================================================================================
-    public static void pausarFundo() {
-
-        if (somFundo != null) {
-            somFundo.stop();
-        }
-    }
-
-    //=====================================================================================================================
-    //Continua a música de fundo do ponto em que ela foi pausada
-    //=====================================================================================================================
-    public static void continuarFundo() {
-
-        if (somFundo != null) {
-            somFundo.loop(Clip.LOOP_CONTINUOUSLY);
-        }
-    }
-
-    //=====================================================================================================================
-    //Para a música de fundo de vez
-    //=====================================================================================================================
-    public static void pararFundo() {
-
-        if (somFundo != null) {
-            somFundo.stop();
-            somFundo.close();
-
-            somFundo = null;
-        }
-    }
-
-    public static String[][] ASCIIDados = {
-        {
-            "    +-----------+",
-            "   /           /|",
-            "  /     o     / |",
-            " /           /  |",
-            "+-----------+   +",
-            "|           |  / ",
-            "|     o     | /  ",
-            "|           |/   ",
-            "+-----------+    ",
-        },
-        {
-            "    +-----------+",
-            "   / o         /|",
-            "  /           / |",
-            " /         o /  |",
-            "+-----------+   +",
-            "| o         |  / ",
-            "|           | /  ",
-            "|         o |/   ",
-            "+-----------+    ",
-        },
-        {
-            "    +-----------+",
-            "   / o         /|",
-            "  /     o     / |",
-            " /         o /  |",
-            "+-----------+   +",
-            "| o         |  / ",
-            "|     o     | /  ",
-            "|         o |/   ",
-            "+-----------+    ",
-        },
-        {
-            "    +-----------+",
-            "   / o       o /|",
-            "  /           / |",
-            " / o       o /  |",
-            "+-----------+   +",
-            "| o       o |  / ",
-            "|           | /  ",
-            "| o       o |/   ",
-            "+-----------+    ",
-        },
-        {
-            "    +-----------+",
-            "   / o       o /|",
-            "  /     o     / |",
-            " / o       o /  |",
-            "+-----------+   +",
-            "| o       o |  / ",
-            "|     o     | /  ",
-            "| o       o |/   ",
-            "+-----------+    ",
-        },
-        {
-            "    +-----------+",
-            "   / o       o /|",
-            "  / o       o / |",
-            " / o       o /  |",
-            "+-----------+   +",
-            "| o       o |  / ",
-            "| o       o | /  ",
-            "| o       o |/   ",
-            "+-----------+    ",
-        },
-    };
-
-    //=====================================================================================================================
-    //Recebe a quantidade de jogadores
-    //=====================================================================================================================
-    public static int quantidadeJog() {
-        int quantPlayers = read();
-        return quantPlayers;
-    }
-
-    //=====================================================================================================================
-    //Define o valor dos dados
-    //=====================================================================================================================
-    public static int[][] dados(int[][] quantDados, int quantPlayers) {
-
-        Random dados = new Random();
-
-        if (quantDados == null) {
-            quantDados = new int[quantPlayers][3];
-
-            for (int linhas = 0; linhas < quantDados.length; linhas++) {
-                for (int colunas = 0; colunas < quantDados[linhas].length; colunas++) {
-                    quantDados[linhas][colunas] = 1;
-                }
+            pularLinhas();
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                System.out.println("Não deu pra esperar");
+                break;
             }
         }
-
-        for (int linhas = 0; linhas < quantDados.length; linhas++) {
-            for (int colunas = 0; colunas < quantDados[linhas].length; colunas++) {
-
-                if (quantDados[linhas][colunas] != 0) {
-
-                    quantDados[linhas][colunas] = dados.nextInt(6) + 1;
-
-                }
-            }
-        }
-
-        return quantDados;
     }
-
-    //=====================================================================================================================
-    //Imprime os dados de um jogador em ASCII art
-    //=====================================================================================================================
-    public static void imprimirDados(int[] dadosJogador) {
-
-        String[] cores = {VERMELHO, AMARELO, VERDE};
-
-        for (int linha = 0; linha < ASCIIDados[0].length; linha++) {
-            for (int colunas = 0; colunas < dadosJogador.length; colunas++) {
-
-                if (dadosJogador[colunas] != 0) {
-                    System.out.print(cores[colunas] + ASCIIDados[dadosJogador[colunas] - 1][linha] + RESET + "   ");
-                }
-            }
+            
+    public static void pularLinhas() {
+        for (int i = 0; i < 30; i++) {
             System.out.println();
         }
     }
-
-    //=====================================================================================================================
-    //Mostra os próprios dados, os dados na mesa e a última tentativa
-    //=====================================================================================================================
-
-    public static void mostrarVez(int[][] quantDados, int jogador, int naMesa, int[] ultmTent) {
-
-        System.out.println("===== Vez do Jogador " + (jogador + 1) + " =====");
-
-        System.out.println("Seus dados:");
-        imprimirDados(quantDados[jogador]);
-
-        System.out.println("Dados na mesa: " + naMesa);
-
-        if (ultmTent[0] == 0) {
-            System.out.println("Última tentativa: nenhuma, você começa a rodada.");
-        }
-        else if (ultmTent[1] == 1) {
-            System.out.println("Última tentativa: " + ultmTent[0] + " coringa(s)");
-        }
-        else {
-            System.out.println("Última tentativa: " + ultmTent[0] + " dado(s) com a face " + ultmTent[1]);
-        }
+    public static void limparTela() {
+        System.out.print("\033[H\033[2J\033[3J");
+        System.out.flush();
     }
-
-    //=====================================================================================================================
-    //Verifica se a jogada é válida
-    //=====================================================================================================================
-
-    public static char[] jogadaCouE(char[] tent, int naMesa, int[] ultmTent){
-
-        tent = new char[3];
-        boolean x = false;
-
-            while (true) {
-
-                if (x == true) {
-                    return tent;
-                }
-
-                tent = mediador();
-
-                if (tent[0] == 'D') {
-                    if (ultmTent[0] != 0) {
-                        x = true;
-                    }
-                }
-                else if (Character.isDigit(tent[0]) && Character.isDigit(tent[1]) && Character.isDigit(tent[2])) {
-
-                    int quant = Character.getNumericValue(tent[0]) * 10 + Character.getNumericValue(tent[1]);
-                    int face = Character.getNumericValue(tent[2]);
-
-                    if (quant >= 1 && quant <= naMesa && face >= 1 && face <= 6) {
-
-                        if (ultmTent[0] == 0) {
-                            x = true;
-                        }
-                        else if (ultmTent[1] != 1 && face != 1) {
-                            if ((quant > ultmTent[0]) || (quant == ultmTent[0] && face > ultmTent[1])) {
-                                x = true;
-                            }
-                        }
-                        else if (ultmTent[1] != 1 && face == 1) {
-                            if (quant >= ultmTent[0] / 2) {
-                                x = true;
-                            }
-                        }
-                        else if (ultmTent[1] == 1 && face == 1) {
-                            if (quant > ultmTent[0]) {
-                                x = true;
-                            }
-                        }
-                        else if (ultmTent[1] == 1 && face != 1) {
-                            if (quant >= ultmTent[0] * 2 + 1) {
-                                x = true;
-                            }
-                        }
-                    }
-
-                    if (x == true) {
-                        ultmTent[0] = quant;
-                        ultmTent[1] = face;
-                    }
-                }
-
-                if (x == false) {
-                    System.out.println("Jogada inválida, tente novamente.");
-                }
-            }
-        }
-
-    //=====================================================================================================================
-    //Soma a quantidade de dados e verifica a tentativa
-    //=====================================================================================================================
-    public static boolean duvidar(int[][] dados, int[] ultmTent) {
-
-        int quant = ultmTent[0];
-        int face = ultmTent[1];
-
-        int[] value = {0, 0, 0, 0, 0, 0};
-
-        boolean resp = false;
-
-        for(int linhas = 0; linhas < dados.length; linhas++) {
-            for(int colunas = 0; colunas < dados[linhas].length; colunas++) {
-
-                switch (dados[linhas][colunas]) {
-                    case 1:
-                        value[0]++;
-                        break;
-                    case 2:
-                        value[1]++;
-                        break;
-                    case 3:
-                        value[2]++;
-                        break;
-                    case 4:
-                        value[3]++;
-                        break;
-                    case 5:
-                        value[4]++;
-                        break;
-                    case 6:
-                        value[5]++;
-                        break;
-
-                }
-            }
-        }
-
-        switch (face) {
-            case 1:
-            if (quant <= value[0]) {
-                resp = true;
-            }
-            break;
-
-            case 2:
-            if (quant <= value[1] + value[0]) {
-                resp = true;
-            }
-            break;
-
-            case 3:
-            if (quant <= value[2] + value[0]) {
-                resp = true;
-            }
-            break;
-
-            case 4:
-            if (quant <= value[3] + value[0]) {
-                resp = true;
-            }
-            break;
-
-            case 5:
-            if (quant <= value[4] + value[0]) {
-                resp = true;
-            }
-            break;
-
-            case 6:
-            if (quant <= value[5] + value[0]) {
-                resp = true;
-            }
-            break;
-       }
-
-       return resp;
-    }
-
-    //=====================================================================================================================
-    //Adiciona a tentativa
-    //=====================================================================================================================
-    public static char[] mediador() {
-
-        char[] tent = new char[3];
-
-            System.out.println("Digite sua tentativa: quantidade e face (ex.: 3 5), ou D para duvidar.");
-
-            String entrada = READ.next();
-
-            if (entrada.equalsIgnoreCase("D")) {
-                tent[0] = 'D';
-            }
-            else {
-
-                if (entrada.length() == 1) {
-                    tent[0] = '0';
-                    tent[1] = entrada.charAt(0);
-                }
-                else if (entrada.length() == 2) {
-                    tent[0] = entrada.charAt(0);
-                    tent[1] = entrada.charAt(1);
-                }
-                else {
-                    tent[0] = 'X';
-                }
-
-                tent[2] = READ.next().charAt(0);
-            }
-
-    return tent;
-    }
-
-    //=====================================================================================================================
-    //Esconde os dados do jogador anterior e espera o próximo jogador assumir o terminal
-    //=====================================================================================================================
-    public static void limparTela(int jogador) {
-
-        System.out.println("Aperte Enter para esconder a tela.");
-        READ.nextLine();
-        READ.nextLine();
-
-        for (int i = 0; i < 50; i++) {
-            System.out.println();
-        }
-
-        System.out.println("Passe para o Jogador " + (jogador + 1) + " e aperte Enter.");
-        READ.nextLine();
-    }
-
-    //=====================================================================================================================
-    //Revela os dados de todos os jogadores que ainda estão no jogo
-    //=====================================================================================================================
-    public static void mostrarTodos(int[][] quantDados) {
-
-        System.out.println("===== Dados revelados =====");
-
-        for (int linhas = 0; linhas < quantDados.length; linhas++) {
-            if (jogadorAtivo(quantDados, linhas)) {
-                System.out.println("Jogador " + (linhas + 1) + ":");
-                imprimirDados(quantDados[linhas]);
-            }
-        }
-    }
-
-    //=====================================================================================================================
-    //Retira um dado do jogador
-    //=====================================================================================================================
-    public static void perderDado(int[][] quantDados, int jogador) {
-
-        for (int colunas = 0; colunas < quantDados[jogador].length; colunas++) {
-            if (quantDados[jogador][colunas] != 0) {
-
-                quantDados[jogador][colunas] = 0;
-                return;
-            }
-        }
-    }
-
-    //=====================================================================================================================
-    //Verifica se o jogador ainda tem pelo menos um dado
-    //=====================================================================================================================
-    public static boolean jogadorAtivo(int[][] quantDados, int jogador) {
-
-        for (int colunas = 0; colunas < quantDados[jogador].length; colunas++) {
-            if (quantDados[jogador][colunas] != 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    //=====================================================================================================================
-    //Conta quantos jogadores ainda têm dados
-    //=====================================================================================================================
-    public static int quantidadeAtivos(int[][] quantDados) {
-
-        int ativos = 0;
-        for (int linhas = 0; linhas < quantDados.length; linhas++) {
-            if (jogadorAtivo(quantDados, linhas)) {
-                ativos++;
-            }
-        }
-        return ativos;
-    }
-
-    //=====================================================================================================================
-    //Retorna o próximo jogador que ainda tem dados, voltando ao primeiro depois do último
-    //=====================================================================================================================
-    public static int proximoJogador(int[][] quantDados, int atual) {
-
-        int proximo = atual;
-        do {
-            proximo = (proximo + 1) % quantDados.length;
-        } while (!jogadorAtivo(quantDados, proximo));
-
-        return proximo;
-    }
-
-    //=====================================================================================================================
-    //Joga uma rodada inteira, do primeiro palpite até alguém duvidar, e retorna o jogador que perde o dado
-    //=====================================================================================================================
-    public static int rodada(int[][] quantDados, int inicio) {
-
-        int[] ultmTent = new int[2];
-
-        int naMesa = 0;
-        for (int linhas = 0; linhas < quantDados.length; linhas++) {
-            for (int colunas = 0; colunas < quantDados[linhas].length; colunas++) {
-                if (quantDados[linhas][colunas] != 0) {
-                    naMesa++;
-                }
-            }
-        }
-
-        int atual = inicio;
-        int ultimoApostou = -1;
-
-        while (true) {
-
-            limparTela(atual);
-            mostrarVez(quantDados, atual, naMesa, ultmTent);
-
-            char[] tent = jogadaCouE(null, naMesa, ultmTent);
-
-            if (tent[0] == 'D') {
-
-                System.out.println();
-                System.out.println("Jogador " + (atual + 1) + " duvidou do Jogador " + (ultimoApostou + 1) + "!");
-                mostrarTodos(quantDados);
-
-                if (duvidar(quantDados, ultmTent)) {
-                    System.out.println("A tentativa estava certa! Jogador " + (atual + 1) + " perde um dado.");
-                    return atual;
-                }
-                else {
-                    System.out.println("A tentativa estava errada! Jogador " + (ultimoApostou + 1) + " perde um dado.");
-                    return ultimoApostou;
-                }
-            }
-
-            ultimoApostou = atual;
-            atual = proximoJogador(quantDados, atual);
-        }
-    }
-
-    //=====================================================================================================================
-    //Mostra quantos dados cada jogador ainda tem
-    //=====================================================================================================================
-    public static void placar(int[][] quantDados) {
-
-        System.out.println("===== Placar =====");
-
-        for (int linhas = 0; linhas < quantDados.length; linhas++) {
-            int quant = 0;
-            for (int colunas = 0; colunas < quantDados[linhas].length; colunas++) {
-                if (quantDados[linhas][colunas] != 0) {
-                    quant++;
-                }
-            }
-            System.out.println("Jogador " + (linhas + 1) + ": " + quant + " dado(s)");
-        }
-    }
-
-    //=====================================================================================================================
-    //Anuncia o único jogador que ainda tem dados
-    //=====================================================================================================================
-    public static void vencedor(int[][] quantDados) {
-
-        for (int linhas = 0; linhas < quantDados.length; linhas++) {
-            if (jogadorAtivo(quantDados, linhas)) {
-                System.out.println();
-                System.out.println("***** Jogador " + (linhas + 1) + " venceu! *****");
-            }
-        }
-    }
-
     public static String AMARELO = "\u001B[93m";
     public static String ROXO = "\u001B[95m";
     public static String VERMELHO = "\u001B[91m";
     public static String VERDE = "\u001B[92m";
     public static String RESET = "\u001B[0m";
 
-    public static String[] ASCIITitulo = {
-        " _____          _____ _____ _   _ _    _  ____  ",
-        "|  __ \\   /\\   |  __ \\_   _| \\ | | |  | |/ __ \\ ",
-        "| |  | | /  \\  | |  | || | |  \\| | |__| | |  | |",
-        "| |  | |/ /\\ \\ | |  | || | | . ` |  __  | |  | |",
-        "| |__| / ____ \\| |__| || |_| |\\  | |  | | |__| |",
-        "|_____/_/    \\_\\_____/_____|_| \\_|_|  |_|\\____/ ",
-    };
+    public static final String DADO_1 = "    +-----------+\n" +
+            "   /           /|\n" +
+            "  /     o     / |\n" +
+            " /           /  |\n" +
+            "+-----------+   +\n" +
+            "|           |  / \n" +
+            "|     o     | /  \n" +
+            "|           |/   \n" +
+            "+-----------+    ";
 
+    public static final String DADO_2 = "    +-----------+\n" +
+            "   / o         / \n" +
+            "  /           / |\n" +
+            " /         o /  |\n" +
+            "+-----------+   +\n" +
+            "| o         |  / \n" +
+            "|           | /  \n" +
+            "|         o |/   \n" +
+            "+-----------+    ";
 
-    //=====================================================================================================================
-    //Empurra o conteúdo da tela para cima com linhas em branco
-    //=====================================================================================================================
-    public static void pularLinhas() {
+    public static final String DADO_3 = "    +-----------+\n" +
+            "   / o         /|\n" +
+            "  /     o     / |\n" +
+            " /         o /  |\n" +
+            "+-----------+   +\n" +
+            "| o         |  / \n" +
+            "|     o     | /  \n" +
+            "|         o |/   \n" +
+            "+-----------+    ";
 
-        for (int i = 0; i < 50; i++) {
-            System.out.println();
-        }
-    }
+    public static final String DADO_4 = "    +-----------+\n" +
+            "   / o       o /|\n" +
+            "  /           / |\n" +
+            " / o       o /  |\n" +
+            "+-----------+   +\n" +
+            "| o       o |  / \n" +
+            "|           | /  \n" +
+            "| o       o |/   \n" +
+            "+-----------+    ";
 
-    //=====================================================================================================================
-    //Desenha uma opção do menu
-    //=====================================================================================================================
-    public static void opcao(char numero, String nome) {
+    public static final String DADO_5 = "    +-----------+\n" +
+            "   / o       o /|\n" +
+            "  /     o     / |\n" +
+            " / o       o /  |\n" +
+            "+-----------+   +\n" +
+            "| o       o |  / \n" +
+            "|     o     | /  \n" +
+            "| o       o |/   \n" +
+            "+-----------+    ";
 
-        int largura = 17;
-        int esquerda = (largura - nome.length()) / 2;
-        int direita = largura - nome.length() - esquerda;
-        String nomeCentralizado = " ".repeat(esquerda) + nome + " ".repeat(direita);
-
-        System.out.println(ROXO + "              +---+   +" + "-".repeat(largura) + "+" + RESET);
-        System.out.println(ROXO + "              | " + AMARELO + numero + ROXO + " |   |" + AMARELO + nomeCentralizado + ROXO + "|" + RESET);
-        System.out.println(ROXO + "              +---+   +" + "-".repeat(largura) + "+" + RESET);
-        System.out.println();
-    }
-
-    //=====================================================================================================================
-    //Mostra o menu inicial e executa a opção escolhida
-    //=====================================================================================================================
-    public static void menu() {
-
-        while (true) {
-
-            pularLinhas();
-
-            for (int linhas = 0; linhas < ASCIITitulo.length; linhas++) {
-                System.out.println(AMARELO + "   " + ASCIITitulo[linhas] + RESET);
-            }
-            System.out.println();
-            System.out.println();
-
-            opcao('1', "JOGAR");
-            opcao('2', "TUTORIAL");
-            opcao('3', "SAIR");
-
-            System.out.println("              Desenvolvido por: Lucas e Kaleb");
-            System.out.println();
-
-            System.out.println("Digite o número da opção.");
-            char escolha = readC();
-
-            while (escolha != '1' && escolha != '2' && escolha != '3') {
-                System.out.println("Opção inválida. Digite 1, 2 ou 3.");
-                escolha = readC();
-            }
-
-            if (escolha == '1') {
-                jogar();
-            }
-            else if (escolha == '2') {
-                tutorial();
-            }
-            else {
-                System.out.println("Até a próxima!");
-                return;
-            }
-        }
-    }
-
-    //=====================================================================================================================
-    //Explica as regras e os comandos do jogo
-    //=====================================================================================================================
-    public static void tutorial() {
-
-        pularLinhas();
-
-        System.out.println("=============================== TUTORIAL ===============================");
-        System.out.println();
-        System.out.println("OBJETIVO");
-        System.out.println("  Ser o último jogador com dados na mesa.");
-        System.out.println();
-        System.out.println("COMO FUNCIONA");
-        System.out.println("  Cada jogador começa com 3 dados e só vê os próprios dados.");
-        System.out.println("  Na sua vez, você faz uma tentativa: quantos dados de uma face você");
-        System.out.println("  acha que existem na mesa, somando os dados de TODOS os jogadores.");
-        System.out.println();
-        System.out.println("  O próximo jogador precisa fazer uma tentativa maior:");
-        System.out.println("    - mesma quantidade com uma face maior (3 dados de 5 -> 3 dados de 6), ou");
-        System.out.println("    - uma quantidade maior (3 dados de 5 -> 4 dados de 2).");
-        System.out.println();
-        System.out.println("CORINGA");
-        System.out.println("  O 1 é coringa: ele conta junto com qualquer face.");
-        System.out.println("  Também dá para apostar só nos coringas:");
-        System.out.println("    - para ir para coringa: pelo menos a metade da última quantidade,");
-        System.out.println("      arredondada para baixo (5 dados de 4 -> 2 coringas).");
-        System.out.println("    - para sair do coringa: pelo menos o dobro + 1 (2 coringas -> 5 dados de 3).");
-        System.out.println();
-        System.out.println("DUVIDAR");
-        System.out.println("  Se achar que a última tentativa é exagerada, digite D.");
-        System.out.println("  Todos os dados são revelados e contados (com os coringas).");
-        System.out.println("    - Se tiver PELO MENOS a quantidade apostada, quem duvidou perde um dado.");
-        System.out.println("    - Se tiver menos, quem fez a tentativa perde um dado.");
-        System.out.println("  Quem perdeu começa a próxima rodada. Sem dados, o jogador sai do jogo.");
-        System.out.println();
-        System.out.println("COMANDOS");
-        System.out.println("  3 5  ->  \"acho que tem 3 dados com a face 5 na mesa\"");
-        System.out.println("  2 1  ->  \"acho que tem 2 coringas na mesa\"");
-        System.out.println("  D    ->  duvidar da última tentativa");
-        System.out.println();
-        System.out.println("  Na troca de jogador, a tela é escondida: passe o teclado e aperte Enter.");
-        System.out.println();
-        System.out.println("========================================================================");
-        System.out.println();
-        System.out.println("Aperte Enter para voltar ao menu.");
-
-        READ.nextLine();
-        READ.nextLine();
-    }
-
-    //=====================================================================================================================
-    //Roda uma partida
-    //=====================================================================================================================
-    public static void jogar() {
-
-        pararFundo();
-        tocarFundo("fundo.wav");
-
-        System.out.println("Insira a quantidade de jogadores");
-        int quantJog = quantidadeJog();
-
-        while (quantJog < 2 || quantJog > 6) {
-            System.out.println("Quantidade inválida, insira de 2 a 6 jogadores");
-            quantJog = quantidadeJog();
-        }
-
-        animacao.animacaoCarregamento();
-
-        int[][] matriz = null;
-        int inicio = 0;
-
-        while (matriz == null || quantidadeAtivos(matriz) > 1) {
-
-            matriz = dados(matriz, quantJog);
-
-            int perdedor = rodada(matriz, inicio);
-            perderDado(matriz, perdedor);
-
-            pausarFundo();
-            tocarSom("morte.wav", true);
-            continuarFundo();
-
-            if (jogadorAtivo(matriz, perdedor)) {
-                inicio = perdedor;
-            }
-            else {
-                System.out.println("Jogador " + (perdedor + 1) + " ficou sem dados e saiu do jogo!");
-                if (quantidadeAtivos(matriz) > 0) {
-                    inicio = proximoJogador(matriz, perdedor);
-                }
-            }
-
-            System.out.println();
-            placar(matriz);
-            System.out.println();
-        }
-
-        vencedor(matriz);
-        pararFundo();
-        tocarSom("vitoria.wav", true);
-
-        System.out.println();
-        System.out.println("Aperte Enter para voltar ao menu.");
-
-        READ.nextLine();
-        READ.nextLine();
-    }
-
-    public static Scanner READ = new Scanner(System.in);
-       public static void main(String[] args) {
-
-        tocarFundo("fundo.wav");
-
-        menu();
-    }
+    public static final String DADO_6 = "    +-----------+\n" +
+            "   / o       o /|\n" +
+            "  / o       o / |\n" +
+            " / o       o /  |\n" +
+            "+-----------+   +\n" +
+            "| o       o |  / \n" +
+            "| o       o | /  \n" +
+            "| o       o |/   \n" +
+            "+-----------+    ";
 }
