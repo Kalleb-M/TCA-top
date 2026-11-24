@@ -4,8 +4,6 @@ import java.lang.Thread;
 
 public class animacao {
     static Random r = new Random();
-    static Scanner READ = new Scanner(System.in);
-
     public static void animacaoCarregamento(){
 
         for (int i = 0; i < 100; i++) {
