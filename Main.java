@@ -774,7 +774,7 @@ public class Main {
             quantJog = quantidadeJog();
         }
 
-        animacao.animacaoCarregaamento();
+        animacao.animacaoCarregamento();
 
         int[][] matriz = null;
         int inicio = 0;
