@@ -4,7 +4,7 @@ import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
 
-public class Bahhhh {
+public class Main {
 
 
     //=====================================================================================================================
@@ -772,6 +772,8 @@ public class Bahhhh {
             System.out.println("Quantidade inválida, insira de 2 a 6 jogadores");
             quantJog = QuantidadeJog();
         }
+
+        animacao.animacaoCarregamento();
 
         int[][] matriz = null;
         int inicio = 0;
