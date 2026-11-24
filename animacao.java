@@ -79,7 +79,7 @@ public class animacao {
             "+-----------+    ";
 
     public static final String DADO_2 = "    +-----------+\n" +
-            "   / o         / \n" +
+            "   / o         /|\n" +
             "  /           / |\n" +
             " /         o /  |\n" +
             "+-----------+   +\n" +
