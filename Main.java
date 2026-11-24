@@ -774,6 +774,8 @@ public class Bahhhh {
             quantJog = quantidadeJog();
         }
 
+        animacao.animacaoCarregaamento();
+
         int[][] matriz = null;
         int inicio = 0;
 
