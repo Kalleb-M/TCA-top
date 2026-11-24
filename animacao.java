@@ -6,12 +6,16 @@ public class animacao {
     static Random r = new Random();
     static Scanner READ = new Scanner(System.in);
 
-        public static void main(String[] args) {
+    public static void animacaoCarregamento(){
 
         for (int i = 0; i < 100; i++) {
 
             limparTela();
             pularLinhas();
+
+            System.out.println(AMARELO + "Preparando a partida..." + RESET);
+            System.out.println("Carregando " + (i + 1) + "%");
+
 
             int numero = r.nextInt(6);
 
@@ -43,7 +47,7 @@ public class animacao {
 
             pularLinhas();
             try {
-                Thread.sleep(500);
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 System.out.println("Não deu pra esperar");
                 break;
