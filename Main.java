@@ -74,13 +74,13 @@ public class LucasKalebTCA {
     }
 
     //Lê valores inteiros
-    public static int Read(){
-        int value = READ.nextInt();
+    public static int read(){
+        int value = read.nextInt();
         return value;
     }
 
-    public static char ReadC(){
-        char value = READ.next().charAt(0);
+    public static char readC(){
+        char value = read.next().charAt(0);
         return value;
     }
 
@@ -90,7 +90,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Deixa a música de fundo em volume baixo e em loop
     //=====================================================================================================================
-    public static void TocarFundo(String caminhoArquivoSom) {
+    public static void tocarFundo(String caminhoArquivoSom) {
 
         // Volume da música de fundo em decibéis
         float volumeFundo = -20.0f;
@@ -116,7 +116,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Pausa a música de fundo, guardando o ponto em que ela parou
     //=====================================================================================================================
-    public static void PausarFundo() {
+    public static void pausarFundo() {
 
         // Só pausa se a música estiver carregada
         if (somFundo != null) {
@@ -128,7 +128,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Continua a música de fundo do ponto em que ela foi pausada
     //=====================================================================================================================
-    public static void ContinuarFundo() {
+    public static void continuarFundo() {
 
         // Só continua se a música estiver carregada
         if (somFundo != null) {
@@ -140,7 +140,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Para a música de fundo de vez
     //=====================================================================================================================
-    public static void PararFundo() {
+    public static void pararFundo() {
 
         // Só para se a música estiver carregada
         if (somFundo != null) {
@@ -154,7 +154,7 @@ public class LucasKalebTCA {
     }
 
     // Desenhos dos dados
-    public static String[][] ASCIIDados = {
+    public static String[][] asciiDados = {
         {
             "    +-----------+",
             "   /           /|",
@@ -226,16 +226,16 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Recebe a quantidade de jogadores
     //=====================================================================================================================
-    public static int QuantidadeJog() {
+    public static int quantidadeJog() {
         // Lê quantos jogadores vão jogar
-        int quantPlayers = Read();
+        int quantPlayers = read();
         return quantPlayers;
     }
 
     //=====================================================================================================================
     //Define o valor dos dados
     //=====================================================================================================================
-    public static int[][] Dados(int[][] quantDados, int quantPlayers) {
+    public static int[][] dados(int[][] quantDados, int quantPlayers) {
 
         // Cria o sorteador dos dados
         Random dados = new Random();
@@ -271,18 +271,18 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Imprime os dados de um jogador em ASCII art
     //=====================================================================================================================
-    public static void ImprimirDados(int[] dadosJogador) {
+    public static void imprimirDados(int[] dadosJogador) {
 
         // Uma cor para cada dado
-        String[] cores = {VERMELHO, AMARELO, VERDE};
+        String[] cores = {vermelho, amarelo, verde};
 
         // Imprime os dados lado a lado
-        for (int linha = 0; linha < ASCIIDados[0].length; linha++) {
+        for (int linha = 0; linha < asciiDados[0].length; linha++) {
             for (int colunas = 0; colunas < dadosJogador.length; colunas++) {
 
                 // Pula os dados perdidos
                 if (dadosJogador[colunas] != 0) {
-                    System.out.print(cores[colunas] + ASCIIDados[dadosJogador[colunas] - 1][linha] + RESET + "   ");
+                    System.out.print(cores[colunas] + asciiDados[dadosJogador[colunas] - 1][linha] + reset + "   ");
                 }
             }
             System.out.println();
@@ -293,14 +293,14 @@ public class LucasKalebTCA {
     //Mostra os próprios dados, os dados na mesa e a última tentativa
     //=====================================================================================================================
 
-    public static void MostrarVez(int[][] quantDados, int jogador, int naMesa, int[] ultmTent) {
+    public static void mostrarVez(int[][] quantDados, int jogador, int naMesa, int[] ultmTent) {
 
         // Mostra de quem é a vez
         System.out.println("===== Vez do Jogador " + (jogador + 1) + " =====");
 
         // Mostra os dados do jogador da vez
         System.out.println("Seus dados:");
-        ImprimirDados(quantDados[jogador]);
+        imprimirDados(quantDados[jogador]);
 
         // Mostra quantos dados tem na mesa
         System.out.println("Dados na mesa: " + naMesa);
@@ -321,7 +321,7 @@ public class LucasKalebTCA {
     //Verifica se a jogada é válida
     //=====================================================================================================================
 
-    public static char[] JogadaCouE(char[] tent, int naMesa, int[] ultmTent){
+    public static char[] jogadaCouE(char[] tent, int naMesa, int[] ultmTent){
 
         // Cria o vetor da tentativa
         tent = new char[3];
@@ -336,7 +336,7 @@ public class LucasKalebTCA {
                 }
 
                 // Lê a tentativa do jogador
-                tent = Mediador();
+                tent = mediador();
 
                 // Duvidar só vale se já tiver tentativa
                 if (tent[0] == 'D') {
@@ -401,7 +401,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Soma a quantidade de dados e verifica a tentativa
     //=====================================================================================================================
-    public static boolean Duvidar(int[][] dados, int[] ultmTent) {
+    public static boolean duvidar(int[][] dados, int[] ultmTent) {
 
         // Pega a tentativa que está sendo duvidada
         int quant = ultmTent[0];
@@ -486,7 +486,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Adiciona a tentativa
     //=====================================================================================================================
-    public static char[] Mediador() {
+    public static char[] mediador() {
 
         // Cria o vetor da tentativa
         char[] tent = new char[3];
@@ -495,7 +495,7 @@ public class LucasKalebTCA {
             System.out.println("Digite sua tentativa: quantidade e face (ex.: 3 5), ou D para duvidar.");
 
             // Lê a quantidade ou o D
-            String entrada = READ.next();
+            String entrada = read.next();
 
             // Se digitou D, marca que quer duvidar
             if (entrada.equalsIgnoreCase("D")) {
@@ -519,7 +519,7 @@ public class LucasKalebTCA {
                 }
 
                 // Lê a face
-                tent[2] = READ.next().charAt(0);
+                tent[2] = read.next().charAt(0);
             }
 
     // Devolve a tentativa
@@ -529,12 +529,12 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Esconde os dados do jogador anterior e espera o próximo jogador assumir o terminal
     //=====================================================================================================================
-    public static void LimparTela(int jogador) {
+    public static void limparTela(int jogador) {
 
         // Espera o jogador anterior apertar Enter
         System.out.println("Aperte Enter para esconder a tela.");
-        READ.nextLine();
-        READ.nextLine();
+        read.nextLine();
+        read.nextLine();
 
         // Esconde os dados do jogador anterior
         for (int i = 0; i < 50; i++) {
@@ -543,21 +543,21 @@ public class LucasKalebTCA {
 
         // Espera o próximo jogador
         System.out.println("Passe para o Jogador " + (jogador + 1) + " e aperte Enter.");
-        READ.nextLine();
+        read.nextLine();
     }
 
     //=====================================================================================================================
     //Revela os dados de todos os jogadores que ainda estão no jogo
     //=====================================================================================================================
-    public static void MostrarTodos(int[][] quantDados) {
+    public static void mostrarTodos(int[][] quantDados) {
 
         System.out.println("===== Dados revelados =====");
 
         // Mostra os dados de quem ainda está no jogo
         for (int linhas = 0; linhas < quantDados.length; linhas++) {
-            if (JogadorAtivo(quantDados, linhas)) {
+            if (jogadorAtivo(quantDados, linhas)) {
                 System.out.println("Jogador " + (linhas + 1) + ":");
-                ImprimirDados(quantDados[linhas]);
+                imprimirDados(quantDados[linhas]);
             }
         }
     }
@@ -565,7 +565,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Retira um dado do jogador
     //=====================================================================================================================
-    public static void PerderDado(int[][] quantDados, int jogador) {
+    public static void perderDado(int[][] quantDados, int jogador) {
 
         // Procura o primeiro dado do jogador
         for (int colunas = 0; colunas < quantDados[jogador].length; colunas++) {
@@ -581,7 +581,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Verifica se o jogador ainda tem pelo menos um dado
     //=====================================================================================================================
-    public static boolean JogadorAtivo(int[][] quantDados, int jogador) {
+    public static boolean jogadorAtivo(int[][] quantDados, int jogador) {
 
         // Achou um dado: o jogador ainda está no jogo
         for (int colunas = 0; colunas < quantDados[jogador].length; colunas++) {
@@ -597,12 +597,12 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Conta quantos jogadores ainda têm dados
     //=====================================================================================================================
-    public static int QuantidadeAtivos(int[][] quantDados) {
+    public static int quantidadeAtivos(int[][] quantDados) {
 
         // Conta os jogadores que ainda têm dados
         int ativos = 0;
         for (int linhas = 0; linhas < quantDados.length; linhas++) {
-            if (JogadorAtivo(quantDados, linhas)) {
+            if (jogadorAtivo(quantDados, linhas)) {
                 ativos++;
             }
         }
@@ -612,13 +612,13 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Retorna o próximo jogador que ainda tem dados, voltando ao primeiro depois do último
     //=====================================================================================================================
-    public static int ProximoJogador(int[][] quantDados, int atual) {
+    public static int proximoJogador(int[][] quantDados, int atual) {
 
         // Passa para o próximo jogador que ainda tem dados
         int proximo = atual;
         do {
             proximo = (proximo + 1) % quantDados.length;
-        } while (!JogadorAtivo(quantDados, proximo));
+        } while (!jogadorAtivo(quantDados, proximo));
 
         return proximo;
     }
@@ -626,7 +626,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Joga uma rodada inteira, do primeiro palpite até alguém duvidar, e retorna o jogador que perde o dado
     //=====================================================================================================================
-    public static int Rodada(int[][] quantDados, int inicio) {
+    public static int rodada(int[][] quantDados, int inicio) {
 
         // Cria a última tentativa
         int[] ultmTent = new int[2];
@@ -649,21 +649,21 @@ public class LucasKalebTCA {
         while (true) {
 
             // Esconde a tela e mostra a vez do jogador
-            LimparTela(atual);
-            MostrarVez(quantDados, atual, naMesa, ultmTent);
+            limparTela(atual);
+            mostrarVez(quantDados, atual, naMesa, ultmTent);
 
             // Lê a jogada
-            char[] tent = JogadaCouE(null, naMesa, ultmTent);
+            char[] tent = jogadaCouE(null, naMesa, ultmTent);
 
             // Se alguém duvidou revela os dados e decide quem perde
             if (tent[0] == 'D') {
 
                 System.out.println();
                 System.out.println("Jogador " + (atual + 1) + " duvidou do Jogador " + (ultimoApostou + 1) + "!");
-                MostrarTodos(quantDados);
+                mostrarTodos(quantDados);
 
                 // Decide quem perde o dado
-                if (Duvidar(quantDados, ultmTent)) {
+                if (duvidar(quantDados, ultmTent)) {
                     System.out.println("A tentativa estava certa! Jogador " + (atual + 1) + " perde um dado.");
                     return atual;
                 }
@@ -675,14 +675,14 @@ public class LucasKalebTCA {
 
             // Se ninguém duvidou guarda quem apostou e passa a vez
             ultimoApostou = atual;
-            atual = ProximoJogador(quantDados, atual);
+            atual = proximoJogador(quantDados, atual);
         }
     }
 
     //=====================================================================================================================
     //Mostra quantos dados cada jogador ainda tem
     //=====================================================================================================================
-    public static void Placar(int[][] quantDados) {
+    public static void placar(int[][] quantDados) {
 
         System.out.println("===== Placar =====");
 
@@ -701,11 +701,11 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Anuncia o único jogador que ainda tem dados
     //=====================================================================================================================
-    public static void Vencedor(int[][] quantDados) {
+    public static void vencedor(int[][] quantDados) {
 
         // Procura o jogador que ainda tem dados
         for (int linhas = 0; linhas < quantDados.length; linhas++) {
-            if (JogadorAtivo(quantDados, linhas)) {
+            if (jogadorAtivo(quantDados, linhas)) {
                 System.out.println();
                 System.out.println("***** Jogador " + (linhas + 1) + " venceu! *****");
             }
@@ -713,14 +713,14 @@ public class LucasKalebTCA {
     }
 
     // Cores do terminal
-    public static String AMARELO = "\u001B[93m";
-    public static String ROXO = "\u001B[95m";
-    public static String VERMELHO = "\u001B[91m";
-    public static String VERDE = "\u001B[92m";
-    public static String RESET = "\u001B[0m";
+    public static String amarelo = "\u001B[93m";
+    public static String roxo = "\u001B[95m";
+    public static String vermelho = "\u001B[91m";
+    public static String verde = "\u001B[92m";
+    public static String reset = "\u001B[0m";
 
     // Título do menu
-    public static String[] ASCIITitulo = {
+    public static String[] asciiTitulo = {
         " _____          _____ _____ _   _ _    _  ____  ",
         "|  __ \\   /\\   |  __ \\_   _| \\ | | |  | |/ __ \\ ",
         "| |  | | /  \\  | |  | || | |  \\| | |__| | |  | |",
@@ -733,7 +733,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Empurra o conteúdo da tela para cima com linhas em branco
     //=====================================================================================================================
-    public static void PularLinhas() {
+    public static void pularLinhas() {
 
         // Imprime 50 linhas em branco
         for (int i = 0; i < 50; i++) {
@@ -744,7 +744,7 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Desenha uma opção do menu
     //=====================================================================================================================
-    public static void Opcao(char numero, String nome) {
+    public static void opcao(char numero, String nome) {
 
         // Centraliza o nome
         int largura = 17;
@@ -753,33 +753,33 @@ public class LucasKalebTCA {
         String nomeCentralizado = " ".repeat(esquerda) + nome + " ".repeat(direita);
 
         // Desenha a opção
-        System.out.println(ROXO + "              +---+   +" + "-".repeat(largura) + "+" + RESET);
-        System.out.println(ROXO + "              | " + AMARELO + numero + ROXO + " |   |" + AMARELO + nomeCentralizado + ROXO + "|" + RESET);
-        System.out.println(ROXO + "              +---+   +" + "-".repeat(largura) + "+" + RESET);
+        System.out.println(roxo + "              +---+   +" + "-".repeat(largura) + "+" + reset);
+        System.out.println(roxo + "              | " + amarelo + numero + roxo + " |   |" + amarelo + nomeCentralizado + roxo + "|" + reset);
+        System.out.println(roxo + "              +---+   +" + "-".repeat(largura) + "+" + reset);
         System.out.println();
     }
 
     //=====================================================================================================================
     //Mostra o menu inicial e executa a opção escolhida
     //=====================================================================================================================
-    public static void Menu() {
+    public static void menu() {
 
         // Mostra o menu até o jogador sair
         while (true) {
 
-            PularLinhas();
+            pularLinhas();
 
             // Desenha o título em amarelo
-            for (int linhas = 0; linhas < ASCIITitulo.length; linhas++) {
-                System.out.println(AMARELO + "   " + ASCIITitulo[linhas] + RESET);
+            for (int linhas = 0; linhas < asciiTitulo.length; linhas++) {
+                System.out.println(amarelo + "   " + asciiTitulo[linhas] + reset);
             }
             System.out.println();
             System.out.println();
 
             // Desenha as opções
-            Opcao('1', "JOGAR");
-            Opcao('2', "TUTORIAL");
-            Opcao('3', "SAIR");
+            opcao('1', "JOGAR");
+            opcao('2', "TUTORIAL");
+            opcao('3', "SAIR");
 
             // Créditos
             System.out.println("              Desenvolvido por: Lucas e Kaleb");
@@ -787,20 +787,20 @@ public class LucasKalebTCA {
 
             // Lê a opção escolhida
             System.out.println("Digite o número da opção.");
-            char escolha = ReadC();
+            char escolha = readC();
 
             // Repete até a opção ser válida
             while (escolha != '1' && escolha != '2' && escolha != '3') {
                 System.out.println("Opção inválida. Digite 1, 2 ou 3.");
-                escolha = ReadC();
+                escolha = readC();
             }
 
             // Executa a opção escolhida
             if (escolha == '1') {
-                Jogar();
+                jogar();
             }
             else if (escolha == '2') {
-                Tutorial();
+                tutorial();
             }
             // Sai do programa
             else {
@@ -813,9 +813,9 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     //Explica as regras e os comandos do jogo
     //=====================================================================================================================
-    public static void Tutorial() {
+    public static void tutorial() {
 
-        PularLinhas();
+        pularLinhas();
 
         // Mostra as regras
         System.out.println("=============================== TUTORIAL ===============================");
@@ -858,27 +858,27 @@ public class LucasKalebTCA {
         // Espera o Enter pra voltar ao menu
         System.out.println("Aperte Enter para voltar ao menu.");
 
-        READ.nextLine();
-        READ.nextLine();
+        read.nextLine();
+        read.nextLine();
     }
 
     //=====================================================================================================================
     //Roda uma partida
     //=====================================================================================================================
-    public static void Jogar() {
+    public static void jogar() {
 
         // Recomeça a música de fundo
-        PararFundo();
-        TocarFundo("fundo.wav");
+        pararFundo();
+        tocarFundo("fundo.wav");
 
         // Lê a quantidade de jogadores
         System.out.println("Insira a quantidade de jogadores");
-        int quantJog = QuantidadeJog();
+        int quantJog = quantidadeJog();
 
         // Repete até a quantidade ser válida
         while (quantJog < 2 || quantJog > 6) {
             System.out.println("Quantidade inválida, insira de 2 a 6 jogadores");
-            quantJog = QuantidadeJog();
+            quantJog = quantidadeJog();
         }
 
         // Começa sem dados e com o Jogador 1
@@ -886,58 +886,58 @@ public class LucasKalebTCA {
         int inicio = 0;
 
         // Joga até sobrar um jogador
-        while (matriz == null || QuantidadeAtivos(matriz) > 1) {
+        while (matriz == null || quantidadeAtivos(matriz) > 1) {
 
             // Rola os dados
-            matriz = Dados(matriz, quantJog);
+            matriz = dados(matriz, quantJog);
 
             // Joga a rodada e tira o dado de quem perdeu
-            int perdedor = Rodada(matriz, inicio);
-            PerderDado(matriz, perdedor);
+            int perdedor = rodada(matriz, inicio);
+            perderDado(matriz, perdedor);
 
             // Toca o som de perder dado com a música pausada
-            PausarFundo();
+            pausarFundo();
             tocarSom("morte.wav", true);
-            ContinuarFundo();
+            continuarFundo();
 
             // Define quem começa a próxima rodada
-            if (JogadorAtivo(matriz, perdedor)) {
+            if (jogadorAtivo(matriz, perdedor)) {
                 inicio = perdedor;
             }
             else {
                 System.out.println("Jogador " + (perdedor + 1) + " ficou sem dados e saiu do jogo!");
-                if (QuantidadeAtivos(matriz) > 0) {
-                    inicio = ProximoJogador(matriz, perdedor);
+                if (quantidadeAtivos(matriz) > 0) {
+                    inicio = proximoJogador(matriz, perdedor);
                 }
             }
 
             // Mostra quantos dados cada um tem
             System.out.println();
-            Placar(matriz);
+            placar(matriz);
             System.out.println();
         }
 
         // Anuncia o vencedor e toca a música de vitória
-        Vencedor(matriz);
-        PararFundo();
+        vencedor(matriz);
+        pararFundo();
         tocarSom("vitoria.wav", true);
 
         // Espera o Enter para voltar ao menu
         System.out.println();
         System.out.println("Aperte Enter para voltar ao menu.");
 
-        READ.nextLine();
-        READ.nextLine();
+        read.nextLine();
+        read.nextLine();
     }
 
     // Leitor do teclado
-    public static Scanner READ = new Scanner(System.in);
+    public static Scanner read = new Scanner(System.in);
        public static void main(String[] args) {
 
         // Liga a música de fundo
-        TocarFundo("fundo.wav");
+        tocarFundo("fundo.wav");
 
         // Abre o menu
-        Menu();
+        menu();
     }
 }
