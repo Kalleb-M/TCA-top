@@ -45,7 +45,7 @@ public class animacao {
 
             pularLinhas();
             try {
-                Thread.sleep(300);
+                Thread.sleep(150);
             } catch (InterruptedException e) {
                 System.out.println("Não deu pra esperar");
                 break;
