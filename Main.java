@@ -36,7 +36,7 @@ public class LucasKalebTCA {
 
             // Fecha o som quando ele termina
             audioClip.addLineListener(evento -> {
-                if (evento.getType() == LineEvent.Type.STOP && audioClip.getFramePosition() >= audioClip.getFrameLength()) {
+                if (evento.getType() == LineEvent.Type.STOP && audioClip != somFundo && audioClip.getFramePosition() >= audioClip.getFrameLength()) {
                     audioClip.close();
                 }
             });
@@ -366,7 +366,7 @@ public class LucasKalebTCA {
                         }
                         // Valida a tentativa (normal para coringa)
                         else if (ultmTent[1] != 1 && face == 1) {
-                            if (quant >= ultmTent[0] / 2) {
+                            if (quant >= (ultmTent[0] + 1) / 2) {
                                 x = true;
                             }
                         }
@@ -377,8 +377,9 @@ public class LucasKalebTCA {
                             }
                         }
                         // Valida a tentativa (coringa para normal)
+                        // (também precisa ser maior que a última aposta normal, para não repetir apostas)
                         else if (ultmTent[1] == 1 && face != 1) {
-                            if (quant >= ultmTent[0] * 2 + 1) {
+                            if (quant >= ultmTent[0] * 2 + 1 && ((quant > ultmTent[2]) || (quant == ultmTent[2] && face > ultmTent[3]))) {
                                 x = true;
                             }
                         }
@@ -388,6 +389,12 @@ public class LucasKalebTCA {
                     if (x == true) {
                         ultmTent[0] = quant;
                         ultmTent[1] = face;
+
+                        // Guarda também a última aposta normal
+                        if (face != 1) {
+                            ultmTent[2] = quant;
+                            ultmTent[3] = face;
+                        }
                     }
                 }
 
@@ -627,8 +634,8 @@ public class LucasKalebTCA {
     //=====================================================================================================================
     public static int rodada(int[][] quantDados, int inicio) {
 
-        // Cria a última tentativa
-        int[] ultmTent = new int[2];
+        // Cria a última tentativa e a última aposta normal
+        int[] ultmTent = new int[4];
 
         // Conta os dados na mesa
         int naMesa = 0;
@@ -835,8 +842,9 @@ public class LucasKalebTCA {
         System.out.println("  O 1 é coringa: ele conta junto com qualquer face.");
         System.out.println("  Também dá para apostar só nos coringas:");
         System.out.println("    - para ir para coringa: pelo menos a metade da última quantidade,");
-        System.out.println("      arredondada para baixo (5 dados de 4 -> 2 coringas).");
-        System.out.println("    - para sair do coringa: pelo menos o dobro + 1 (2 coringas -> 5 dados de 3).");
+        System.out.println("      arredondada para cima (5 dados de 4 -> 3 coringas).");
+        System.out.println("    - para sair do coringa: pelo menos o dobro + 1 (2 coringas -> 5 dados de 3),");
+        System.out.println("      e maior que a última aposta sem coringa da rodada.");
         System.out.println();
         System.out.println("DUVIDAR");
         System.out.println("  Se achar que a última tentativa é exagerada, digite D.");
@@ -879,8 +887,6 @@ public class LucasKalebTCA {
             System.out.println("Quantidade inválida, insira de 2 a 6 jogadores");
             quantJog = quantidadeJog();
         }
-
-        animacao.animacaoCarregamento();
 
         // Começa sem dados e com o Jogador 1
         int[][] matriz = null;
