@@ -881,6 +881,8 @@ public class LucasKalebTCA {
             quantJog = quantidadeJog();
         }
 
+        animacao.animacaoCarregamento();
+
         // Começa sem dados e com o Jogador 1
         int[][] matriz = null;
         int inicio = 0;
